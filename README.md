@@ -24,3 +24,27 @@ As part of this process however, you should look to refactor some of the code in
 Once you have completed your work, send us a link to your public repository.
 
 Good luck!
+
+# Changes & reasoning
+
+The commit history may be self-explanatory, but I thought I'd try and add a bit more detail here just in case...
+
+## "Bug" fixes
+
+I wasn't sure whether the actual logic within the `TransferMoney` service was meant to be changed beyond a simple refactor but given that the notifications could be sent even if the balances didn't change I decided to go with it and re-order the logic so that notifications would be sent after we were sure everything was successful and the balance changes had been persisted. 
+
+I assumed that the repository saving would already handle situations were the `Update` call on `from` worked, but the `Update` call on `to` didn't (e.g. rolling back the changes manually, or them otherwise being in some transaction) and that one of the calls would throw an exception if there was a problem thereby preventing the notification services from being called.
+
+## Refactor adding/deducting balances
+
+From there I did a pretty straightforward encapsulation of the add/deduct balance logic and the validation that goes with it. I left the exceptions being thrown in the service classes so that the messages could be customised in other services while the validation logic would remain the same.
+
+I toyed with the idea of having an `enum` return value rather than true/false so that it's easier to add extra validation failures later but decided that was probably overkill at this point given that there's been no indication there will be other validation. Another option would be to have those new methods throw exceptions, catch them in the service layer then rethrow them wrapped in another exception. That way the outer exception could indicate the process that was failing (e.g. transfer failed) with the inner exception representing the exact reason why. Again, that seemed probably a bit overkill for this example, but worth considering for future expansion.
+
+## Refactor account notification logic
+
+Next I again did a pretty straightforward encapsulation of the logic that determines whether notifications should be generated. As the `PayInLimit` is only used in the `Account` class I also made that private.
+
+## Add withdraw logic
+
+Now that everything's been refactored I was able to take just the withdraw and low funds notification logic from the transfer service, changing the exception's message, and use that for the withdraw service.
