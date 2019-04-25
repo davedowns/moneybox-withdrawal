@@ -4,7 +4,9 @@ namespace Moneybox.App
 {
     public class Account
     {
-        public const decimal PayInLimit = 4000m;
+        private const decimal PayInLimit = 4000m;
+        private const decimal PayInLimitTideMark = 500m;
+        private const decimal LowFundsTideMark = 500m;
 
         public Guid Id { get; set; }
 
@@ -40,6 +42,16 @@ namespace Moneybox.App
             this.Balance = this.Balance - amount;
             this.Withdrawn = this.Withdrawn - amount;
             return true;
+        }
+
+        public bool IsApproachingPayLimit()
+        {
+            return Account.PayInLimit - this.PaidIn < PayInLimitTideMark;
+        }
+
+        public bool HasLowFunds()
+        {
+            return this.Balance < LowFundsTideMark;
         }
     }
 }

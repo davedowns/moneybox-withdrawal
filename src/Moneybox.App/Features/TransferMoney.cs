@@ -33,12 +33,12 @@ namespace Moneybox.App.Features
             this.accountRepository.Update(from);
             this.accountRepository.Update(to);
 
-            if (from.Balance < 500m)
+            if (from.HasLowFunds())
             {
                 this.notificationService.NotifyFundsLow(from.User.Email);
             }
 
-            if (Account.PayInLimit - to.PaidIn < 500m)
+            if (to.IsApproachingPayLimit())
             {
                 this.notificationService.NotifyApproachingPayInLimit(to.User.Email);
             }
