@@ -26,15 +26,15 @@ namespace Moneybox.App.Features
                 throw new InvalidOperationException("Insufficient funds to make transfer");
             }
 
-            if (fromBalance < 500m)
-            {
-                this.notificationService.NotifyFundsLow(from.User.Email);
-            }
-
             var paidIn = to.PaidIn + amount;
             if (paidIn > Account.PayInLimit)
             {
                 throw new InvalidOperationException("Account pay in limit reached");
+            }
+
+            if (fromBalance < 500m)
+            {
+                this.notificationService.NotifyFundsLow(from.User.Email);
             }
 
             if (Account.PayInLimit - paidIn < 500m)
